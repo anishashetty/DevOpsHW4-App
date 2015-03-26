@@ -1,79 +1,78 @@
-Cache, Proxies, Queues
-=========================
+###Complete set/get 
+The value is set in the "set" route using. The value for key expires in 10 seconds
+<pre>
+client.set("key", "this message will self-destruct in 10 seconds")
+client.expire("key",10)
+</pre>
 
-### Setup
+The retrieval of the value corresponding to"key" is retrieved in the get/ route. 
+This is done as follows:
+<pre>
+client.get("key", function(err, value) {
+    res.send(value)
+});
+</pre>
 
-* Clone this repo, run `npm install`.
-* Install redis and run on localhost:6379
+###Complete recent
+The urls visited are stored in a queue.
+The hook is defined in the .use function for the proxy server.
+<pre>
+client.lpush('recenturl',req.url)
+</pre>
 
-### A simple web server
+The 5 most recent urls are retrieved using lrangein the /recent route as follows.
+<pre>
+client.lrange('recenturl', 0, 5, function(err, reply) {
+    res.send(reply); 
+});
+</pre>
 
-Use [express](http://expressjs.com/) to install a simple web server.
+###Complete upload/meow
+The image content is stored in the upload route and retieved to be displayed as an image in the /meow route
+<pre>
+app.use('/uploads', express.static(__dirname + '/uploads'));
+ app.post('/upload',[ multer({ dest: './uploads/'}), function(req, res){
+    console.log(req.files) // form files
+    if( req.files.image )
+    {
+ 	   fs.readFile( req.files.image.path, function (err, data) {
+ 	  		if (err) throw err;
+ 	  		var img = new Buffer(data).toString('base64');
+			client.rpush('items',req.files.image.path)
+ 		});
+ 	}
+    res.status(204).end()
+ }]);
+</pre>
 
-	var server = app.listen(3000, function () {
+###Additional service instance running
+An additional service is defined as a server which listens on port 3001.
+<pre>
+ var server2 = app.listen(3001, function () {
+
+   var host = server2.address().address
+   var port = server2.address().port
+   client.lpush("url","http://"+host+":"+port)
+   console.log('Example app listening at http://%s:%s', host, port)
+ })
+</pre>
+
+###Demonstrate proxy
+An third server listening on port 3002 is defined which acts as a proxy .
+It redirects the urls by toggling between servers listening on port 3000 and 3001 alternatively.
+The proxy uses rpoplpush to implement the toggling logic.
+Thus all requested urls are recedived by this proxy .
+<pre>
+app_proxy.use(function(req,res,next){
+
+	//logic to toggle between  two servers and redirect the url to appropriate server.
+	var url = "http://";
 	
-	  var host = server.address().address
-	  var port = server.address().port
-	
-	  console.log('Example app listening at http://%s:%s', host, port)
+	client.rpoplpush("url","url",function(err,value){
+	console.log("redirecting to "+value+req.url)
+	res.redirect(307,value+req.url);
 	})
 
-Express uses the concept of routes to use pattern matching against requests and sending them to specific functions.  You can simply write back a response body.
 
-	app.get('/', function(req, res) {
-	  res.send('hello world')
-	})
-
-### Redis
-
-You will be using [redis](http://redis.io/) to build some simple infrastructure components, using the [node-redis client](https://github.com/mranney/node_redis).
-
-	var redis = require('redis')
-	var client = redis.createClient(6379, '127.0.0.1', {})
-
-In general, you can run all the redis commands in the following manner: client.CMD(args). For example:
-
-	client.set("key", "value");
-	client.get("key", function(err,value){ console.log(value)});
-
-### An expiring cache
-
-Create two routes, `/get` and `/set`.
-
-When `/set` is visited, set a new key, with the value:
-> "this message will self-destruct in 10 seconds".
-
-Use the expire command to make sure this key will expire in 10 seconds.
-
-When `/get` is visited, fetch that key, and send value back to the client: `res.send(value)` 
-
-
-### Recent visited sites
-
-Create a new route, `/recent`, which will display the most recently visited sites.
-
-There is already a global hook setup, which will allow you to see each site that is requested:
-
-	app.use(function(req, res, next) 
-	{
-	...
-
-Use the lpush, ltrim, and lrange redis commands to store the most recent 5 sites visited, and return that to the client.
-
-### Cat picture uploads: queue
-
-Implement two routes, `/upload`, and `/meow`.
- 
-A stub for upload and meow has already been provided.
-
-Use curl to help you upload easily.
-
-	curl -F "image=@./img/morning.jpg" localhost:3000/upload
-
-Have `upload` store the images in a queue.  Have `meow` display the most recent image to the client and *remove* the image from the queue.
-
-### Proxy server
-
-Bonus: How might you use redis and express to introduce a proxy server?
-
-See [rpoplpush](http://redis.io/commands/rpoplpush)
+});
+</pre>
