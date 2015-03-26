@@ -13,15 +13,18 @@ client.flushdb()
 // Add hook to make it easier to get all visited URLS.
 app.use(function(req, res, next)
 {
+	
 	console.log(req.method, req.url);
-
 	client.lpush('recenturl',req.url)
-
 	next(); // Passing the request to the next handler in the stack.
+
 });
 
 app_proxy.use(function(req,res,next){
+	//adding to queue to retrieve 5 most recently visited urls in /recent
+	
 
+	//Here toggling between two servers is implemented
 	var url = "http://";
 	
 	client.rpoplpush("url","url",function(err,value){
@@ -29,9 +32,7 @@ app_proxy.use(function(req,res,next){
 	res.redirect(307,value+req.url);
 	})
 	
-	//res.writeHead(301,{Location: url});
-	//res.end();
-	//next()
+	
 
 });
 app.use('/uploads', express.static(__dirname + '/uploads'));
@@ -46,7 +47,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
  	  		if (err) throw err;
  	  		var img = new Buffer(data).toString('base64');
 			client.rpush('items',req.files.image.path)
- 	  		console.log("YO!"+req.files.image.path);
+ 	  		
  		});
  	}
 
@@ -101,13 +102,14 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 
 	console.log('Example app listening at http://%s:%s', host, port)
  })
-
+//set value that expires in 10 seconds
 app.get('/set', function(req, res) {
 client.set("key", "this message will self-destruct in 10 seconds")
 client.expire("key",10)
 res.send("value set.Will expire in 10 seconds!")
 })
 
+//display value if applicable
 app.get('/get', function(req, res) {
 
 client.get("key", function(err, value) {
@@ -120,7 +122,7 @@ app.get('/', function(req, res) {
 })
 
 app.get('/recent', function(req, res) {
-client.lrange('recenturl', 0, 5, function(err, reply) {
+client.lrange('recenturl', 0, 4, function(err, reply) {
     res.send(reply); 
 });
 })
