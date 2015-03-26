@@ -15,7 +15,7 @@ client.get("key", function(err, value) {
 
 ###Complete recent
 The urls visited are stored in a queue.
-The hook is defined in the .use function for the proxy server.
+The hook is defined in the .use function. The urls are stored against the key: "recenturl"
 <pre>
 client.lpush('recenturl',req.url)
 </pre>
@@ -44,6 +44,8 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
     res.status(204).end()
  }]);
 </pre>
+
+The image is gesplayed using the /meow route
 
 ###Additional service instance running
 An additional service is defined as a server which listens on port 3001.
