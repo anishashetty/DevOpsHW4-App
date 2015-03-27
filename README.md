@@ -29,6 +29,8 @@ client.lrange('recenturl', 0, 5, function(err, reply) {
 
 ###Complete upload/meow
 The image content is stored in the upload route and retieved to be displayed as an image in the /meow route
+use the below command to upload image:
+curl -L -F "image=@./img/morning.jpg" localhost:3002/upload
 <pre>
 app.use('/uploads', express.static(__dirname + '/uploads'));
  app.post('/upload',[ multer({ dest: './uploads/'}), function(req, res){
