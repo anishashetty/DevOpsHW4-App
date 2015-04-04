@@ -13,7 +13,7 @@ client.flushdb()
 // Add hook to make it easier to get all visited URLS.
 app.use(function(req, res, next)
 {
-	
+
 	console.log(req.method, req.url);
 	client.lpush('recenturl',req.url)
 	next(); // Passing the request to the next handler in the stack.
@@ -22,17 +22,17 @@ app.use(function(req, res, next)
 
 app_proxy.use(function(req,res,next){
 	//adding to queue to retrieve 5 most recently visited urls in /recent
-	
+
 
 	//Here toggling between two servers is implemented
 	var url = "http://";
-	
+
 	client.rpoplpush("url","url",function(err,value){
 	console.log("redirecting to "+value+req.url)
 	res.redirect(307,value+req.url);
 	})
-	
-	
+
+
 
 });
 app.use('/uploads', express.static(__dirname + '/uploads'));
@@ -47,7 +47,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
  	  		if (err) throw err;
  	  		var img = new Buffer(data).toString('base64');
 			client.rpush('items',req.files.image.path)
- 	  		
+
  		});
  	}
 
@@ -58,7 +58,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
  	{
  		//if (err) throw err
  		//res.writeHead(200, {'content-type':'text/html'});
- 		client.rpop('items',function (err,imagedata) 
+ 		client.rpop('items',function (err,imagedata)
  		{
  		if(imagedata != null){
 		res.writeHead(200, {'content-type':'text/html'});
@@ -68,7 +68,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 		res.send("No image to display")
 
  		});
-    	
+
  	}
  })
 
@@ -79,9 +79,9 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 
    var host = server1.address().address
    var port = server1.address().port
-   
+
    client.lpush("url","http://"+host+":"+port)
-    
+
    console.log('Example app listening at http://%s:%s', host, port)
  })
 
@@ -94,7 +94,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
    console.log('Example app listening at http://%s:%s', host, port)
  })
 
-// HTTP PROXY SERVER 
+// HTTP PROXY SERVER
  var proxy = app_proxy.listen(3002, function () {
 
 	var host = proxy.address().address
@@ -123,7 +123,8 @@ app.get('/', function(req, res) {
 
 app.get('/recent', function(req, res) {
 client.lrange('recenturl', 0, 4, function(err, reply) {
-    res.send(reply); 
+    res.send(reply);
 });
 })
 
+//comment1
