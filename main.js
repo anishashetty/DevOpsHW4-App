@@ -65,7 +65,7 @@ app.use(__dirname + '/uploads', express.static(__dirname + '/uploads'));
  		{
  		if(imagedata != null){
 		res.writeHead(200, {'content-type':'text/html'});
-               res.write("<h1>\n<img src='/"+imagedata+"'/>");
+               res.write("<h1>\n<img src='"+imagedata+"'/>");
 		res.end();}
 		else
 		res.send("No image to display")
