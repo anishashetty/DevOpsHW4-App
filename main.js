@@ -108,10 +108,14 @@ app.get('/', function(req, res) {
   res.send('hello world')
 })
 
+app.get('/switch', function(req, res) {
+  res.send('Example app listening at http://%s:%s', host, port)
+})
+
 app.get('/recent', function(req, res) {
 client.lrange('recenturl', 0, 4, function(err, reply) {
     res.send(reply);
 });
 })
 
-//comment2
+//comment
