@@ -109,6 +109,8 @@ app.get('/', function(req, res) {
 })
 
 app.get('/switch', function(req, res) {
+	var host = server1.address().address
+	var port = server1.address().port
   res.send('Example app listening at http://%s:%s', host, port)
 })
 
