@@ -104,9 +104,9 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
  })
 //set value that expires in 10 seconds
 app.get('/set', function(req, res) {
-client.set("key", "this message will self-destruct in 10 seconds")
-client.expire("key",10)
-res.send("value set.Will expire in 10 seconds!")
+client.set("key", "this message will self-destruct in 20 seconds")
+client.expire("key",20)
+res.send("value set.Will expire in 20 seconds!")
 })
 
 //display value if applicable
