@@ -4,8 +4,8 @@ var express = require('express')
 var fs      = require('fs')
 var app = express()
 var app_proxy = express()
-var PORT = args[0];
-var REDDIS_PORT = args[1];
+var PORT = process.argv[2];
+var REDDIS_PORT = process.argv[3];
 // REDIS
 var client = redis.createClient(REDDIS_PORT, '127.0.0.1', {})
 
