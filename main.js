@@ -4,10 +4,12 @@ var express = require('express')
 var fs      = require('fs')
 var app = express()
 var app_proxy = express()
+
 // REDIS
 var client = redis.createClient(6379, '127.0.0.1', {})
-client.flushdb()
 
+client.flushdb()
+var PORT = args[0];
 ///////////// WEB ROUTES
 
 // Add hook to make it easier to get all visited URLS.
@@ -75,7 +77,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 
 
 // HTTP SERVER
- var server1 = app.listen(3000, function () {
+ var server1 = app.listen(PORT, function () {
 
    var host = server1.address().address
    var port = server1.address().port
@@ -85,23 +87,23 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
    console.log('Example app listening at http://%s:%s', host, port)
  })
 
-// HTTP SERVER 2
- var server2 = app.listen(3001, function () {
-
-   var host = server2.address().address
-   var port = server2.address().port
-   client.lpush("url","http://"+host+":"+port)
-   console.log('Example app listening at http://%s:%s', host, port)
- })
-
-// HTTP PROXY SERVER
- var proxy = app_proxy.listen(3002, function () {
-
-	var host = proxy.address().address
-	var port = proxy.address().port
-
-	console.log('Example app listening at http://%s:%s', host, port)
- })
+// // HTTP SERVER 2
+//  var server2 = app.listen(3001, function () {
+//
+//    var host = server2.address().address
+//    var port = server2.address().port
+//    client.lpush("url","http://"+host+":"+port)
+//    console.log('Example app listening at http://%s:%s', host, port)
+//  })
+//
+// // HTTP PROXY SERVER
+//  var proxy = app_proxy.listen(3002, function () {
+//
+// 	var host = proxy.address().address
+// 	var port = proxy.address().port
+// //
+// 	console.log('Example app listening at http://%s:%s', host, port)
+//  })
 //set value that expires in 10 seconds
 app.get('/set', function(req, res) {
 client.set("key", "this message will self-destruct in 20 seconds")
