@@ -48,8 +48,9 @@ app.use(__dirname + '/uploads', express.static(__dirname + '/uploads'));
     {
  	   fs.readFile( req.files.image.path, function (err, data) {
  	  		if (err) throw err;
- 	  		var img = new Buffer(data).toString('base64');
-			client.rpush('items',req.files.image.path)
+ 	  	var img = new Buffer(data).toString('base64');
+			//client.rpush('items',req.files.image.path)
+			client.rpush('items',img)
 
  		});
  	}
@@ -64,9 +65,18 @@ app.use(__dirname + '/uploads', express.static(__dirname + '/uploads'));
  		client.rpop('items',function (err,imagedata)
  		{
  		if(imagedata != null){
+		// res.writeHead(200, {'content-type':'text/html'});
+    //            res.write("<h1>\n<img src='"+imagedata+"'/>");
+		// res.end();
 		res.writeHead(200, {'content-type':'text/html'});
-               res.write("<h1>\n<img src='"+imagedata+"'/>");
-		res.end();}
+		items.forEach(function (imagedata)
+		{
+		res.write("<h1>\n<img src='data:my_pic.jpg;base64,"+imagedata+"'/>");
+		});
+		
+		}
+
+
 		else
 		res.send("No image to display")
 
