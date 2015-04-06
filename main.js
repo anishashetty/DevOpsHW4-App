@@ -69,11 +69,11 @@ app.use(__dirname + '/uploads', express.static(__dirname + '/uploads'));
     //            res.write("<h1>\n<img src='"+imagedata+"'/>");
 		// res.end();
 		res.writeHead(200, {'content-type':'text/html'});
-		items.forEach(function (imagedata)
-		{
+		//items.forEach(function (imagedata)
+		// {
 		res.write("<h1>\n<img src='data:my_pic.jpg;base64,"+imagedata+"'/>");
-		});
-		
+		res.end();
+
 		}
 
 
